@@ -1,0 +1,116 @@
+
+books = {
+    "978-1234567890": {
+        "title": "Book Title",
+        "author": "Author Name",
+        "genre": "Fiction",
+        "total_copies": 5
+    },
+}
+members = [
+    {
+        "member_id": "M001",
+        "name": "Alice Smith",
+        "email": "alice@example.com",
+        "borrowed_books": ["978-1234567890", "978-0987654321"]
+    },
+    ...
+]
+genres = ("Fiction", "Non-Fiction", "Sci-Fi", "Fantasy", "Biography")
+books = {}
+members = []
+genres = ("Fiction", "Non-Fiction", "Sci-Fi", "Fantasy", "Biography")
+def add_book(isbn, title, author, genre, total_copies):
+    if isbn in books:
+        return "Book already exists."
+    if genre not in genres:
+        return "Invalid genre."
+    books[isbn] = {
+        "title": title,
+        "author": author,
+        "genre": genre,
+        "total_copies": total_copies
+    }
+    return "Book added successfully."
+
+def add_member(member_id, name, email):
+    for member in members:
+        if member["member_id"] == member_id:
+            return "Member already exists."
+    members.append({
+        "member_id": member_id,
+        "name": name,
+        "email": email,
+        "borrowed_books": []
+    })
+    return "Member added successfully."
+
+def search_books(query):
+    results = []
+    for isbn, details in books.items():
+        if query.lower() in details["title"].lower() or query.lower() in details["author"].lower():
+            results.append((isbn, details))
+    return results
+
+def update_book(isbn, **kwargs):
+    if isbn not in books:
+        return "Book not found."
+    for key, value in kwargs.items():
+        if key == "genre" and value not in genres:
+            return "Invalid genre."
+        books[isbn][key] = value
+    return "Book updated successfully."
+
+def update_member(member_id, **kwargs):
+    for member in members:
+        if member["member_id"] == member_id:
+            for key, value in kwargs.items():
+                member[key] = value
+            return "Member updated successfully."
+    return "Member not found."
+
+def delete_book(isbn):
+    for member in members:
+        if isbn in member["borrowed_books"]:
+            return "Cannot delete: book is currently borrowed."
+    if isbn in books:
+        del books[isbn]
+        return "Book deleted successfully."
+    return "Book not found."
+
+def delete_member(member_id):
+    for member in members:
+        if member["member_id"] == member_id:
+            if member["borrowed_books"]:
+                return "Cannot delete: member has borrowed books."
+            members.remove(member)
+            return "Member deleted successfully."
+    return "Member not found."
+
+def borrow_book(member_id, isbn):
+    if isbn not in books or books[isbn]["total_copies"] <= 0:
+        return "Book not available."
+    for member in members:
+        if member["member_id"] == member_id:
+            if len(member["borrowed_books"]) >= 3:
+                return "Borrow limit reached."
+            member["borrowed_books"].append(isbn)
+            books[isbn]["total_copies"] -= 1
+            return "Book borrowed successfully."
+    return "Member not found."
+
+def return_book(member_id, isbn):
+    for member in members:
+        if member["member_id"] == member_id:
+            if isbn in member["borrowed_books"]:
+                member["borrowed_books"].remove(isbn)
+                books[isbn]["total_copies"] += 1
+                return "Book returned successfully."
+            return "Book not borrowed by member."
+    return "Member not found."
+
+
+
+
+
+
